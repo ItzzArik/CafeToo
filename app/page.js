@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Coffee, Utensils, Lock } from 'lucide-react';
@@ -8,6 +8,20 @@ import OwnerAuthModal from '@/components/OwnerAuthModal';
 
 export default function LandingPage() {
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [particles, setParticles] = useState([]);
+
+    // Hydration Fix: Generate random values only on client
+    useEffect(() => {
+        setParticles([...Array(15)].map(() => ({
+            width: Math.random() * 10 + 2 + 'px',
+            height: Math.random() * 10 + 2 + 'px',
+            left: Math.random() * 100 + '%',
+            top: Math.random() * 100 + '%',
+            duration: Math.random() * 15 + 10,
+            xOffset: Math.random() * 50 - 25,
+            opacity: [0.1, 0.4, 0.1]
+        })));
+    }, []);
 
     // Parallax Logic
     const x = useMotionValue(0);
@@ -53,23 +67,23 @@ export default function LandingPage() {
 
             {/* Background Ambience */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
-                {[...Array(15)].map((_, i) => (
+                {particles.map((p, i) => (
                     <motion.div
                         key={i}
                         className="absolute bg-white/10 rounded-full blur-[1px]"
                         style={{
-                            width: Math.random() * 10 + 2 + 'px',
-                            height: Math.random() * 10 + 2 + 'px',
-                            left: Math.random() * 100 + '%',
-                            top: Math.random() * 100 + '%',
+                            width: p.width,
+                            height: p.height,
+                            left: p.left,
+                            top: p.top,
                         }}
                         animate={{
                             y: [0, -100, 0],
-                            x: [0, Math.random() * 50 - 25, 0],
-                            opacity: [0.1, 0.4, 0.1],
+                            x: [0, p.xOffset, 0],
+                            opacity: p.opacity,
                         }}
                         transition={{
-                            duration: Math.random() * 15 + 10,
+                            duration: p.duration,
                             repeat: Infinity,
                             ease: "linear",
                         }}
